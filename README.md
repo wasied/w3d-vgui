@@ -1,5 +1,6 @@
 # w3d-vgui
-An easy 3D vgui creation library in Garry's Mod
+An easy 3D vgui creation library in Garry's Mod.  
+⚒ **Warning:** This is still in phase of development, please don't use this for a public usage yet. ⚒
 
 ### Installation
 1. Download the repo and copy the **w3d_vgui.lua** file into the **/lua/client/** folder of your addon/gamemode.  
