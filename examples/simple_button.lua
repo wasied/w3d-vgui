@@ -1,4 +1,5 @@
 -- This is a simple example with a defined position and angle.
+-- Don't forget to load the actual file before doing this.
 -- Feel free to PR some suggestions :)
 
 local vecOrigin = Vector(428, 482, -12223)

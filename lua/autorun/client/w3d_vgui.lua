@@ -3,15 +3,16 @@
 -- I do not provide any support to this library. You can still try opening an issue on GitHub to get help.
 -- Have fun, Wasied.
 
+w3d = {}
+w3d.tCache = w3d.tCache or {
+    tButtons = {}
+}
+
 --[[-------------------------------------------------]]--
 --[[                   LOCAL CACHE                   ]]--
 --[[     As we need to optimize the best we can,     ]]--
 --[[   I'm trying to CPU-optimize everything I can   ]]--
 --[[-------------------------------------------------]]--
-
-local w3d = {
-    tCache = { tButtons = {} }
-}
 
 local tVGUIList = {}
 local pLocal
@@ -150,5 +151,3 @@ function w3d.Create(sType, sId, x, y, w, h, fcCallback, fcPaint)
     tVGUIList[sType](sId, x, y, w, h, fcCallback, fcPaint)
 
 end
-
-return w3d
