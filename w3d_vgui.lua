@@ -88,6 +88,7 @@ hook.Add("KeyPress", "w3d:KeyPress", function(pPlayer, iKey)
 
         if w3d.IsHovered(tInfos.x, tInfos.y, tInfos.w, tInfos.h) then
             tInfos.fcCallback(sId)
+            hook.Run("w3d:ButtonPressed", sId)
             break
         end
 
