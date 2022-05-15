@@ -1,0 +1,154 @@
+-- This library has been created by Wasied on may2022
+-- You are allowed to use it anywhere but you must credit the author (Wasied)
+-- I do not provide any support to this library. You can still try opening an issue on GitHub to get help.
+-- Have fun, Wasied.
+
+--[[-------------------------------------------------]]--
+--[[                   LOCAL CACHE                   ]]--
+--[[     As we need to optimize the best we can,     ]]--
+--[[   I'm trying to CPU-optimize everything I can   ]]--
+--[[-------------------------------------------------]]--
+
+local w3d = {
+    tCache = { tButtons = {} }
+}
+
+local tVGUIList = {}
+local pLocal
+
+--[[-----------------]]--
+--[[ LOCAL FUNCTIONS ]]--
+--[[-----------------]]--
+
+-- Check if the input is allowed (he can use the 3d2d vgui) for the local player
+local function IsInputAllowed()
+
+    -- Disable when render target is not the main one (took from imgui)
+    if render.GetRenderTarget() then return false end
+
+    -- Disable when the cursor is controlled by the player
+    if vgui.CursorVisible() then return false end
+
+    -- Disable when being in the context menu
+    if vgui.GetHoveredPanel() == g_ContextMenu then return false end
+
+    return true
+
+end
+
+-- Button creation callback
+local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint)
+
+    local bHovered = w3d.IsHovered(x, y, w, h)
+
+    -- Paint the button (custom or by default)
+    if isfunction(fcPaint) then
+        fcPaint(w, h, bHovered)
+    else
+        
+        surface.SetDrawColor(bHovered and Color(87, 75, 144, 220) or Color(48, 57, 82, 200))
+        surface.DrawRect(x, y, w, h)
+
+        draw.SimpleText("Wasied", "Trebuchet24", x + w / 2, y + h / 2, color_white, 1, 1)
+
+    end
+
+    -- Make a default callback just to show it works
+    if not isfunction(fcCallback) then
+        fcCallback = function()
+            chat.AddText(Color(0, 110, 255), "Such a great developer! This is the default callback function")
+        end
+    end
+
+    -- Register the button in order to make it clickable
+    w3d.tCache.tButtons[sId] = { x = x, y = y, w = w, h = h, fcCallback = fcCallback }
+
+end
+tVGUIList["DButton"] = CreateButton
+
+
+--[[------------------]]--
+--[[ PUBLIC FUNCTIONS ]]--
+--[[------------------]]--
+
+-- Start 3D2D context
+function w3d.Start3D2D(vecTarget, angTarget, iScale)
+
+    if not IsValid(pLocal) then
+        pLocal = LocalPlayer()
+    end
+
+    cam.Start3D2D(vecTarget, angTarget, iScale)
+
+    local tTrace = pLocal:GetEyeTrace()
+    local vecHitPos = util.IntersectRayWithPlane(tTrace.StartPos, tTrace.Normal, vecTarget, angTarget:Up())
+
+    if vecHitPos then
+        local vecDelta = vecTarget - vecHitPos
+
+        w3d.tCache.iMouseX = vecDelta:Dot(-angTarget:Forward()) / iScale
+        w3d.tCache.iMouseY = vecDelta:Dot(-angTarget:Right()) / iScale
+    end
+
+    return true
+
+end
+
+-- End 3D2D context
+function w3d.End3D2D()
+
+    cam.End3D2D()
+    return true
+
+end
+
+-- Get the mouse position relative to the screen
+function w3d.GetMousePos()
+    return w3d.tCache.iMouseX or 0, w3d.tCache.iMouseY or 0
+end
+
+-- Check if the mouse is hovering something on the screen
+function w3d.IsHovered(x, y, w, h)
+    local iMouseX, iMouseY = w3d.GetMousePos()
+    return iMouseX >= x and iMouseX <= x + w and iMouseY >= y and iMouseY <= y + h
+end
+
+
+--[[-----------]]--
+--[[ OUR HOOKS ]]--
+--[[-----------]]--
+
+-- Called when the player press the primary attack button
+hook.Add("KeyPress", "w3d:KeyPress", function(pPlayer, iKey)
+
+    if not IsFirstTimePredicted() then return end
+    if not IsValid(pPlayer) or iKey ~= IN_ATTACK then return end
+
+    for sId, tInfos in pairs(w3d.tCache.tButtons or {}) do
+
+        if w3d.IsHovered(tInfos.x, tInfos.y, tInfos.w, tInfos.h) then
+            tInfos.fcCallback(sId)
+            break
+        end
+
+    end
+
+end)
+
+--[[----------------------------------------------------]]--
+--[[             CUSTOM 3D2D VGUI ELEMENTS              ]]--
+--[[  In order to make the usage easy, I created some   ]]--
+--[[  predefined elements that you can easily create.   ]]--
+--[[----------------------------------------------------]]--
+
+-- Create a new vgui element
+function w3d.Create(sType, sId, x, y, w, h, fcCallback, fcPaint)
+
+    if not isfunction(tVGUIList[sType]) then return false, "Invalid vgui type (#1)" end
+    if not isstring(sId) then return false, "Invalid unique identifier (#2)" end
+
+    tVGUIList[sType](sId, x, y, w, h, fcCallback, fcPaint)
+
+end
+
+return w3d
