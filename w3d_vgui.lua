@@ -4,9 +4,7 @@
 -- Have fun, Wasied.
 
 w3d = {}
-w3d.tCache = w3d.tCache or {
-    tButtons = {}
-}
+w3d.tCache = w3d.tCache or { tButtons = {} }
 
 --[[-------------------------------------------------]]--
 --[[                   LOCAL CACHE                   ]]--
@@ -16,6 +14,21 @@ w3d.tCache = w3d.tCache or {
 
 local tVGUIList = {}
 local pLocal
+
+--[[-----------------]]--
+--[[ LOCAL FUNCTIONS ]]--
+--[[-----------------]]--
+
+-- Clear buttons from the cache when they are not existing anymore
+local function ClearButtonsCache()
+
+    for sId, tInfos in pairs(w3d.tCache.tButtons or {}) do
+        if SysTime() - RealFrameTime() > tInfos.iLastTime then
+            w3d.tCache.tButtons[sId] = nil
+        end
+    end
+
+end
 
 --[[------------------]]--
 --[[ PUBLIC FUNCTIONS ]]--
@@ -84,6 +97,8 @@ hook.Add("KeyPress", "w3d:KeyPress", function(pPlayer, iKey)
     if not IsFirstTimePredicted() then return end
     if not IsValid(pPlayer) or iKey ~= IN_ATTACK then return end
 
+    ClearButtonsCache()
+
     for sId, tInfos in pairs(w3d.tCache.tButtons or {}) do
 
         if w3d.IsHovered(tInfos.x, tInfos.y, tInfos.w, tInfos.h) then
@@ -127,7 +142,7 @@ local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint)
     end
 
     -- Register the button in order to make it clickable
-    w3d.tCache.tButtons[sId] = { x = x, y = y, w = w, h = h, fcCallback = fcCallback }
+    w3d.tCache.tButtons[sId] = { x = x, y = y, w = w, h = h, fcCallback = fcCallback, iLastTime = SysTime() }
 
 end
 tVGUIList["DButton"] = CreateButton
