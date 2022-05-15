@@ -95,7 +95,8 @@ end
 hook.Add("KeyPress", "w3d:KeyPress", function(pPlayer, iKey)
 
     if not IsFirstTimePredicted() then return end
-    if not IsValid(pPlayer) or iKey ~= IN_ATTACK then return end
+    if not IsValid(pPlayer) or not pPlayer:IsPlayer() then return end
+    if iKey ~= IN_ATTACK and iKey ~= IN_USE then return end
 
     ClearButtonsCache()
 
