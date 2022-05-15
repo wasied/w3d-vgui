@@ -109,7 +109,7 @@ local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint)
 
     -- Paint the button (custom or by default)
     if isfunction(fcPaint) then
-        fcPaint(w, h, bHovered)
+        fcPaint(x, y, w, h, bHovered)
     else
         
         surface.SetDrawColor(bHovered and Color(87, 75, 144, 220) or Color(48, 57, 82, 200))

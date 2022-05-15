@@ -13,7 +13,7 @@ hook.Add("PostDrawTranslucentRenderables", "test", function(bDepth, bSkybox)
             function()
                 chat.AddText(Color(255, 40, 40), "Hey! It's working!")
             end,
-            function(w, h, bHovered)
+            function(x, y, w, h, bHovered)
                 surface.SetDrawColor(bHovered and Color(107, 107, 107, 200) or Color(0, 0, 0, 230))
                 surface.DrawRect(0, 0, w, h)
 
