@@ -17,57 +17,6 @@ w3d.tCache = w3d.tCache or {
 local tVGUIList = {}
 local pLocal
 
---[[-----------------]]--
---[[ LOCAL FUNCTIONS ]]--
---[[-----------------]]--
-
--- Check if the input is allowed (he can use the 3d2d vgui) for the local player
-local function IsInputAllowed()
-
-    -- Disable when render target is not the main one (took from imgui)
-    if render.GetRenderTarget() then return false end
-
-    -- Disable when the cursor is controlled by the player
-    if vgui.CursorVisible() then return false end
-
-    -- Disable when being in the context menu
-    if vgui.GetHoveredPanel() == g_ContextMenu then return false end
-
-    return true
-
-end
-
--- Button creation callback
-local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint)
-
-    local bHovered = w3d.IsHovered(x, y, w, h)
-
-    -- Paint the button (custom or by default)
-    if isfunction(fcPaint) then
-        fcPaint(w, h, bHovered)
-    else
-        
-        surface.SetDrawColor(bHovered and Color(87, 75, 144, 220) or Color(48, 57, 82, 200))
-        surface.DrawRect(x, y, w, h)
-
-        draw.SimpleText("Wasied", "Trebuchet24", x + w / 2, y + h / 2, color_white, 1, 1)
-
-    end
-
-    -- Make a default callback just to show it works
-    if not isfunction(fcCallback) then
-        fcCallback = function()
-            chat.AddText(Color(0, 110, 255), "Such a great developer! This is the default callback function")
-        end
-    end
-
-    -- Register the button in order to make it clickable
-    w3d.tCache.tButtons[sId] = { x = x, y = y, w = w, h = h, fcCallback = fcCallback }
-
-end
-tVGUIList["DButton"] = CreateButton
-
-
 --[[------------------]]--
 --[[ PUBLIC FUNCTIONS ]]--
 --[[------------------]]--
@@ -114,6 +63,16 @@ function w3d.IsHovered(x, y, w, h)
     return iMouseX >= x and iMouseX <= x + w and iMouseY >= y and iMouseY <= y + h
 end
 
+-- Create a new vgui element
+function w3d.Create(sType, sId, x, y, w, h, fcCallback, fcPaint)
+
+    if not isfunction(tVGUIList[sType]) then return false, "Invalid vgui type (#1)" end
+    if not isstring(sId) then return false, "Invalid unique identifier (#2)" end
+
+    tVGUIList[sType](sId, x, y, w, h, fcCallback, fcPaint)
+
+end
+
 
 --[[-----------]]--
 --[[ OUR HOOKS ]]--
@@ -142,12 +101,32 @@ end)
 --[[  predefined elements that you can easily create.   ]]--
 --[[----------------------------------------------------]]--
 
--- Create a new vgui element
-function w3d.Create(sType, sId, x, y, w, h, fcCallback, fcPaint)
+-- Button creation callback
+local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint)
 
-    if not isfunction(tVGUIList[sType]) then return false, "Invalid vgui type (#1)" end
-    if not isstring(sId) then return false, "Invalid unique identifier (#2)" end
+    local bHovered = w3d.IsHovered(x, y, w, h)
 
-    tVGUIList[sType](sId, x, y, w, h, fcCallback, fcPaint)
+    -- Paint the button (custom or by default)
+    if isfunction(fcPaint) then
+        fcPaint(w, h, bHovered)
+    else
+        
+        surface.SetDrawColor(bHovered and Color(87, 75, 144, 220) or Color(48, 57, 82, 200))
+        surface.DrawRect(x, y, w, h)
+
+        draw.SimpleText("Wasied", "Trebuchet24", x + w / 2, y + h / 2, color_white, 1, 1)
+
+    end
+
+    -- Make a default callback just to show it works
+    if not isfunction(fcCallback) then
+        fcCallback = function()
+            chat.AddText(Color(0, 110, 255), "Such a great developer! This is the default callback function")
+        end
+    end
+
+    -- Register the button in order to make it clickable
+    w3d.tCache.tButtons[sId] = { x = x, y = y, w = w, h = h, fcCallback = fcCallback }
 
 end
+tVGUIList["DButton"] = CreateButton
