@@ -79,8 +79,15 @@ end
 
 -- Check if the mouse is hovering something on the screen
 function w3d.IsHovered(x, y, w, h)
-    local iMouseX, iMouseY = w3d.GetMousePos()
-    return iMouseX >= x and iMouseX <= x + w and iMouseY >= y and iMouseY <= y + h
+
+    local iMouseX, iMouseY = w3d.tCache.iMouseX, w3d.tCache.iMouseY
+    
+    if iMouseX and iMouseY then
+        return iMouseX >= x and iMouseX <= x + w and iMouseY >= y and iMouseY <= y + h
+    end
+
+    return false
+
 end
 
 -- Create a new vgui element
