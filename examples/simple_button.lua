@@ -4,10 +4,11 @@
 
 local vecOrigin = Vector(428, 482, -12223)
 local angOrigin = Angle(0, 90, 90)
+local iMaxDist = 250 ^ 2 -- WARNING: This is a sqrt distance
 
 hook.Add("PostDrawTranslucentRenderables", "test", function(bDepth, bSkybox)
 
-    w3d.Start3D2D(vecOrigin, angOrigin, 0.1)
+    w3d.Start3D2D(vecOrigin, angOrigin, 0.1, iMaxDist)
 
         w3d.Create("DButton", "SomeUniqueID", 0, 0, 300, 80, 
             function()

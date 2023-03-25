@@ -35,7 +35,7 @@ end
 --[[------------------]]--
 
 -- Start 3D2D context
-function w3d.Start3D2D(vecTarget, angTarget, iScale)
+function w3d.Start3D2D(vecTarget, angTarget, iScale, iUseDistance)
 
     if not IsValid(pLocal) then
         pLocal = LocalPlayer()
@@ -46,11 +46,18 @@ function w3d.Start3D2D(vecTarget, angTarget, iScale)
     local tTrace = pLocal:GetEyeTrace()
     local vecHitPos = util.IntersectRayWithPlane(tTrace.StartPos, tTrace.Normal, vecTarget, angTarget:Up())
 
-    if vecHitPos then
+    if iUseDistance and tTrace.StartPos:DistToSqr(vecTarget) > iUseDistance then
+    
+        w3d.tCache.iMouseX = nil
+        w3d.tCache.iMouseY = nil
+    
+    elseif vecHitPos then
+        
         local vecDelta = vecTarget - vecHitPos
 
         w3d.tCache.iMouseX = vecDelta:Dot(-angTarget:Forward()) / iScale
         w3d.tCache.iMouseY = vecDelta:Dot(-angTarget:Right()) / iScale
+    
     end
 
     return true
