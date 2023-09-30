@@ -116,7 +116,7 @@ hook.Add("KeyPress", "w3d:KeyPress", function(pPlayer, iKey)
 
     for sId, tInfos in pairs(w3d.tCache.tButtons or {}) do
 
-        if w3d.IsHovered(tInfos.x, tInfos.y, tInfos.w, tInfos.h) then
+        if tInfos.bHovered then
             tInfos.fcCallback(sId)
             hook.Run("w3d:ButtonPressed", sId)
             break
@@ -157,7 +157,7 @@ local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint)
     end
 
     -- Register the button in order to make it clickable
-    w3d.tCache.tButtons[sId] = { x = x, y = y, w = w, h = h, fcCallback = fcCallback, iLastTime = SysTime() }
+    w3d.tCache.tButtons[sId] = { x = x, y = y, w = w, h = h, bHovered = bHovered, fcCallback = fcCallback, iLastTime = SysTime() }
 
 end
 tVGUIList["DButton"] = CreateButton
