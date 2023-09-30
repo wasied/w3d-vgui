@@ -80,26 +80,37 @@ end
 -- Check if the mouse is hovering something on the screen
 function w3d.IsHovered(x, y, w, h)
 
-    local iMouseX, iMouseY = w3d.tCache.iMouseX, w3d.tCache.iMouseY
-    
+    local iMouseX, iMouseY = w3d.GetMousePos()
+
     if iMouseX and iMouseY then
         return iMouseX >= x and iMouseX <= x + w and iMouseY >= y and iMouseY <= y + h
     end
 
-    return false
-
 end
 
 -- Create a new vgui element
-function w3d.Create(sType, sId, x, y, w, h, fcCallback, fcPaint)
+function w3d.Create(sType, sId, x, y, w, h, fcCallback, fcPaint, bNoButton)
 
     if not isfunction(tVGUIList[sType]) then return false, "Invalid vgui type (#1)" end
     if not isstring(sId) then return false, "Invalid unique identifier (#2)" end
 
-    tVGUIList[sType](sId, x, y, w, h, fcCallback, fcPaint)
+    tVGUIList[sType](sId, x, y, w, h, fcCallback, fcPaint, bNoButton)
 
 end
 
+-- Recreate the table of the buttons
+function w3d.ReworkButtonsTable()
+
+    local tButtons = {}
+
+    for sId, tInfos in pairs(w3d.tCache.tButtons or {}) do
+        tInfos.sId = sId
+        table.insert(tButtons, tInfos)
+    end
+
+    return tButtons
+
+end
 
 --[[-----------]]--
 --[[ OUR HOOKS ]]--
@@ -114,12 +125,11 @@ hook.Add("KeyPress", "w3d:KeyPress", function(pPlayer, iKey)
 
     ClearButtonsCache()
 
-    for sId, tInfos in pairs(w3d.tCache.tButtons or {}) do
+    for i, tInfos in ipairs(w3d.ReworkButtonsTable() or {}) do
 
-        if w3d.IsHovered(tInfos.x, tInfos.y, tInfos.w, tInfos.h) then
-            tInfos.fcCallback(sId)
-            hook.Run("w3d:ButtonPressed", sId)
-            break
+        if tInfos.bHovered then
+            tInfos.fcCallback(tInfos.sId)
+            hook.Run("w3d:ButtonPressed", tInfos.sId)
         end
 
     end
@@ -133,9 +143,10 @@ end)
 --[[----------------------------------------------------]]--
 
 -- Button creation callback
-local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint)
+local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint, bNoButton)
 
     local bHovered = w3d.IsHovered(x, y, w, h)
+    bNoButton = bNoButton or false
 
     -- Paint the button (custom or by default)
     if isfunction(fcPaint) then
@@ -157,7 +168,7 @@ local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint)
     end
 
     -- Register the button in order to make it clickable
-    w3d.tCache.tButtons[sId] = { x = x, y = y, w = w, h = h, fcCallback = fcCallback, iLastTime = SysTime() }
+    w3d.tCache.tButtons[sId] = { x = x, y = y, w = w, h = h, bHovered = bHovered, fcCallback = fcCallback, iLastTime = SysTime(), bNoButton = bNoButton }
 
 end
 tVGUIList["DButton"] = CreateButton
