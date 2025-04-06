@@ -46,18 +46,20 @@ function w3d.Start3D2D(vecTarget, angTarget, iScale, iUseDistance)
     local tTrace = pLocal:GetEyeTrace()
     local vecHitPos = util.IntersectRayWithPlane(tTrace.StartPos, tTrace.Normal, vecTarget, angTarget:Up())
 
+    w3d.tCache.sUniqueId = tostring(vecTarget)..tostring(angTarget)..tostring(iScale)
+
     if iUseDistance and tTrace.StartPos:DistToSqr(vecTarget) > iUseDistance then
-    
+
         w3d.tCache.iMouseX = nil
         w3d.tCache.iMouseY = nil
-    
+
     elseif vecHitPos then
-        
+
         local vecDelta = vecTarget - vecHitPos
 
         w3d.tCache.iMouseX = vecDelta:Dot(-angTarget:Forward()) / iScale
         w3d.tCache.iMouseY = vecDelta:Dot(-angTarget:Right()) / iScale
-    
+
     end
 
     return true
@@ -81,7 +83,7 @@ end
 function w3d.IsHovered(x, y, w, h)
 
     local iMouseX, iMouseY = w3d.tCache.iMouseX, w3d.tCache.iMouseY
-    
+
     if iMouseX and iMouseY then
         return iMouseX >= x and iMouseX <= x + w and iMouseY >= y and iMouseY <= y + h
     end
@@ -141,7 +143,7 @@ local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint)
     if isfunction(fcPaint) then
         fcPaint(x, y, w, h, bHovered)
     else
-        
+
         surface.SetDrawColor(bHovered and Color(87, 75, 144, 220) or Color(48, 57, 82, 200))
         surface.DrawRect(x, y, w, h)
 
@@ -157,7 +159,7 @@ local function CreateButton(sId, x, y, w, h, fcCallback, fcPaint)
     end
 
     -- Register the button in order to make it clickable
-    w3d.tCache.tButtons[sId] = { x = x, y = y, w = w, h = h, bHovered = bHovered, fcCallback = fcCallback, iLastTime = SysTime() }
+    w3d.tCache.tButtons[(w3d.tCache.sUniqueId or "")..":"..sId] = { x = x, y = y, w = w, h = h, bHovered = bHovered, fcCallback = fcCallback, iLastTime = SysTime() }
 
 end
 tVGUIList["DButton"] = CreateButton
