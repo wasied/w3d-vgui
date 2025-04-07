@@ -3,6 +3,8 @@
 -- I do not provide any support to this library. You can still try opening an issue on GitHub to get help.
 -- Have fun, Wasied.
 
+if w3d then return end -- Do not load the library twice
+
 w3d = {}
 w3d.tCache = w3d.tCache or { tButtons = {} }
 
